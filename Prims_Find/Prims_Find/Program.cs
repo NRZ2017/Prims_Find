@@ -6,7 +6,7 @@ namespace Prims_Find
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            
         }
     }
 }
