@@ -8,10 +8,10 @@ namespace Prims_Find
 {
     class Graph<T>
     {
-        public List<Vertex<T>> Vertices = new List<Vertex<T>>();
+        public List<Vertex<T>> Vertices { get; set; }
         public int EdgeCount { get; private set; }
 
-        public Graph<Point> this[int index]
+        public Vertex<T> this[int index]
         {
             get
             {
@@ -21,6 +21,8 @@ namespace Prims_Find
 
         public Graph()
         {
+            Vertices = new List<Vertex<T>>();
+            EdgeCount = Vertices.Count;
         }
 
         public void AddVertex(Vertex<T> vert)
@@ -93,14 +95,45 @@ namespace Prims_Find
                 for (int x = 0; x < width; x++)
                 {
                     graph.AddVertex(new Vertex<Point>(new Point(x, y)));
-                    info.Add(graph[graph.Vertices.Count - 1], new HashSet<Vertex<Point>>());
+                    // from graph we need the last vertex's point
+
+
+                    info.Add(graph[graph.EdgeCount - 1], new HashSet<Vertex<Point>>());
                 }
             }
 
-            var begin = graph[gen.Next(graph.EdgeCount)];
-            begin.Vertices[0].IsVisited = true;
+            for (int i = 0; i < graph.EdgeCount - 1; i++)
+            {
+                if((i + 1) % width == 0)
+                {
+                    i++;
+                }
 
-            
+
+                info[graph[i]].Add(graph[i + 1]);
+                info[graph[i + width]].Add(graph[i]);    
+            }
+
+            for (int i = 0; i < graph.EdgeCount - width; i++)
+            {
+                info[graph[i]].Add(graph[i + width]);
+                info[graph[i + width]].Add(graph[i]);
+            }
+
+            var start = graph[gen.Next(graph.EdgeCount)];
+            start.IsVisited = true;
+
+            frontier.UnionWith(info[start]);
+
+            while(frontier.Count > 0)
+            {
+                var curr = frontier.ElementAt(gen.Next(frontier.Count));
+                frontier.Remove(curr);
+                var Neib = info[curr].Where(x => x.IsVisited).ToList();
+                graph.AddEdge(curr, Neib[gen.Next(Neib.Count)], 1);
+                curr.IsVisited = true;
+                frontier.UnionWith(info[curr].Where(x => !x.IsVisited));
+            }
 
             return graph;
         }

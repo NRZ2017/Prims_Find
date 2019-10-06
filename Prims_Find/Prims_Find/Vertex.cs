@@ -7,7 +7,7 @@ namespace Prims_Find
         public class Vertex<T>
         {
 
-            public T Value;
+            public T Value { get; private set; }
 
             public bool IsVisited = false;
             public double TotalDistance = double.PositiveInfinity;
